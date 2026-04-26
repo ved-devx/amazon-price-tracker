@@ -1,5 +1,6 @@
 import re
 import os
+
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 import csv
 import threading
@@ -114,6 +115,7 @@ def track_price():
     check_price_btn.configure(state="normal")
     results_txt_box.configure(state='disabled')
 
+
 def check_price():
     results_txt_box.configure(state='normal')
     track_product_price_btn.configure(state="disabled")
@@ -121,7 +123,7 @@ def check_price():
     all_products_data = []
 
     file_path = filedialog.askopenfilename(title="Select a CSV file to track ", filetypes=[("CSV Files", "*.csv")])
-    if not file_path:# TURN BUTTONS BACK ON IF CANCELLED
+    if not file_path:  # TURN BUTTONS BACK ON IF CANCELLED
         track_product_price_btn.configure(state="normal")
         check_price_btn.configure(state="normal")
         results_txt_box.configure(state='disabled')
@@ -185,6 +187,8 @@ def check_price():
         soup = BeautifulSoup(html_content, "html.parser")
         # All products
         all_products = soup.find_all("div", {"data-component-type": "s-search-result"})
+        if not all_products:
+            results_txt_box.insert("end", "⚠️ No products found (page not loaded properly)\n")
 
         for product in all_products:
             product_name_details = product.find("h2")
@@ -227,8 +231,9 @@ def check_price():
         # Changing the scraping Method according to the url/page
         if "/dp/" in current_url or "/gp/" in current_url:
             parse_single_item(html_content, current_url)
-        elif "/s?" in current_url or "/search" in current_url:
+        elif "/s" in current_url or "/search" in current_url:
             parse_search_results(html_content, current_url)
+
     def run_browser():
         results_txt_box.insert("end", "⏳ Checking live prices...\n\n")
 
@@ -244,7 +249,7 @@ def check_price():
                 try:
                     page = context.new_page()
                     page.goto(clean_url, wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_timeout(5000)  # 5s human delay
+                    page.wait_for_selector('div[data-component-type="s-search-result"]', timeout=10000)  # human delay
                     html_content = page.content()
                     page.close()
                     # print(f"Successfully Fetched url {i}")
@@ -258,9 +263,10 @@ def check_price():
         results_txt_box.insert("end", "✅ Finished checking prices!\n")
         results_txt_box.configure(state='disabled')
 
-    check_thread=threading.Thread(target=run_browser)
+    check_thread = threading.Thread(target=run_browser)
     check_thread.daemon = True
     check_thread.start()
+
 
 def start_scraping_thread():
     scraper_thread = threading.Thread(target=track_price)
