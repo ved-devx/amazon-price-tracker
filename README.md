@@ -10,7 +10,7 @@ Built with Python, Playwright, BeautifulSoup, and CustomTkinter.
 
 - Track prices from **single product pages** and **search result pages**
 - Paste **multiple URLs at once**
-- Real-time scraping using a headless browser
+- Real-time scraping using an automated browser
 - Save scraped data into CSV
 - Compare old vs new prices (Price Drop / Increase / No Change)
 - Clean and responsive GUI (no freezing)
@@ -21,7 +21,7 @@ Built with Python, Playwright, BeautifulSoup, and CustomTkinter.
 
 ### 🔹 1. URL Input
 - User pastes one or multiple Amazon URLs
-- URLs are extracted using regex
+- URLs are extracted automatically
 
 ---
 
@@ -29,7 +29,7 @@ Built with Python, Playwright, BeautifulSoup, and CustomTkinter.
 The app detects the type of page:
 
 - `/dp/` or `/gp/` → Single Product Page  
-- `/s?` → Search Results Page  
+- `/s` → Search Results Page  
 
 And applies the correct scraping logic automatically.
 
@@ -50,9 +50,9 @@ For search pages:
 ### 🔹 4. Live Scraping Engine
 
 - Uses Playwright (Chromium)
-- Runs in headless mode
-- Adds delay to mimic human behavior
-- Prevents blocking
+- Runs with a visible automated browser for better reliability
+- Mimics real user behavior
+- Ensures consistent data extraction
 
 ---
 
@@ -60,7 +60,7 @@ For search pages:
 
 - Shows structured results inside GUI
 - Live updates while scraping
-- Uses emojis for clarity:
+- Uses indicators for clarity:
   - 🛍️ Single product
   - 🔍 Search results
 
@@ -69,8 +69,8 @@ For search pages:
 ### 🔹 6. CSV Export
 
 - User selects save location
-- Data saved as: URL | Product Name | Product Price
-
+- Data saved as:  
+  `URL | Product Name | Product Price`
 
 ---
 
@@ -104,26 +104,26 @@ Shows:
 
 ## 📦 What You Get
 
-- Ready-to-use `.exe` application
-- No Python installation required
-- Simple and clean interface
+- Ready-to-use `.exe` application  
+- No Python installation required  
+- Simple and clean interface  
 
 ---
 
 ## ⚠️ Note
 
 Amazon frequently updates its website structure.  
-If scraping stops working, selectors may need to be updated.
+Scraping reliability may vary, and selectors may need updates over time.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Python
-- Playwright
-- BeautifulSoup
-- CustomTkinter
-- CSV
+- Python  
+- Playwright  
+- BeautifulSoup  
+- CustomTkinter  
+- CSV  
 
 ---
 
