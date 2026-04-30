@@ -1,6 +1,5 @@
 import re
 import os
-
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 import csv
 import threading
@@ -8,6 +7,8 @@ import customtkinter
 from bs4 import BeautifulSoup
 from customtkinter import filedialog
 from playwright.sync_api import sync_playwright
+import random
+import time
 
 
 def track_price():
@@ -75,7 +76,7 @@ def track_price():
     results_txt_box.insert("end", "⏳ Scraping...\n\n")
     with sync_playwright() as p:
         # Fetching Amazon HTML
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
         context = browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                        'Chrome/122.0.0.0 Safari/537.36'
@@ -84,11 +85,13 @@ def track_price():
             clean_url = url.strip()
             try:
                 page = context.new_page()
+                page.set_viewport_size({"width": 800, "height": 600})
                 page.goto(clean_url, wait_until="domcontentloaded", timeout=30000)
-                page.wait_for_timeout(5000)  # 5s human delay
+                # Random human-like delay (3-8 seconds)
+                delay = random.uniform(3, 8)
+                time.sleep(delay)
                 html_content = page.content()
                 page.close()
-                # print(f"Successfully Fetched url {i}")
                 route_and_parse(clean_url, html_content)
             except Exception as e:
                 results_txt_box.insert("end", f"Failed to fetch {url}:{e}")
@@ -239,7 +242,7 @@ def check_price():
 
         with sync_playwright() as p:
             # Fetching Amazon HTML
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=False)
             context = browser.new_context(
                 user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                            'Chrome/122.0.0.0 Safari/537.36'
@@ -249,10 +252,11 @@ def check_price():
                 try:
                     page = context.new_page()
                     page.goto(clean_url, wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_selector('div[data-component-type="s-search-result"]', timeout=10000)  # human delay
+                    # Random human-like delay (3-8 seconds)
+                    delay = random.uniform(3, 8)
+                    time.sleep(delay)
                     html_content = page.content()
                     page.close()
-                    # print(f"Successfully Fetched url {i}")
                     route_and_parse(clean_url, html_content)
                 except Exception as e:
                     results_txt_box.insert("end", f"Failed to fetch {url}:{e}")
