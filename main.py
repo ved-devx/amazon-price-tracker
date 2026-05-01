@@ -1,6 +1,5 @@
 import re
 import os
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
 import csv
 import threading
 import customtkinter
@@ -9,6 +8,41 @@ from customtkinter import filedialog
 from playwright.sync_api import sync_playwright
 import random
 import time
+import platform
+import subprocess
+
+
+def get_chrome_path():
+    """Find the Chrome executable path on different operating systems"""
+    system = platform.system()
+    
+    if system == "Windows":
+        # Common Windows Chrome paths
+        paths = [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            os.path.expanduser(r"~\AppData\Local\Google\Chrome\Application\chrome.exe"),
+        ]
+        for path in paths:
+            if os.path.exists(path):
+                return path
+    elif system == "Darwin":  # macOS
+        path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        if os.path.exists(path):
+            return path
+    elif system == "Linux":
+        # Try to find Chrome using 'which' command
+        try:
+            result = subprocess.run(['which', 'google-chrome'], capture_output=True, text=True)
+            if result.returncode == 0:
+                return result.stdout.strip()
+            result = subprocess.run(['which', 'chromium-browser'], capture_output=True, text=True)
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except:
+            pass
+    
+    return None  # Chrome not found
 
 
 def track_price():
@@ -75,8 +109,15 @@ def track_price():
     results_txt_box.delete("1.0", "end")
     results_txt_box.insert("end", "⏳ Scraping...\n\n")
     with sync_playwright() as p:
-        # Fetching Amazon HTML
-        browser = p.chromium.launch(headless=False)
+        # Find system Chrome executable path
+        chrome_path = get_chrome_path()
+        
+        # Fetching Amazon HTML using system Chrome
+        browser = p.chromium.launch(
+            headless=False,
+            executable_path=chrome_path if chrome_path else None,
+            args=['--disable-blink-features=AutomationControlled']
+        )
         context = browser.new_context(
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                        'Chrome/122.0.0.0 Safari/537.36'
@@ -204,8 +245,6 @@ def check_price():
 
             # Comparing Old and New Prices
             status = ""
-            # Comparing Old and New Prices
-            status = ""
             if product_price_text != "Out of Stock/No Price🛒❌":
                 if product_name_details_text in old_prices:
                     try:
@@ -241,8 +280,15 @@ def check_price():
         results_txt_box.insert("end", "⏳ Checking live prices...\n\n")
 
         with sync_playwright() as p:
-            # Fetching Amazon HTML
-            browser = p.chromium.launch(headless=False)
+            # Find system Chrome executable path
+            chrome_path = get_chrome_path()
+            
+            # Fetching Amazon HTML using system Chrome
+            browser = p.chromium.launch(
+                headless=False,
+                executable_path=chrome_path if chrome_path else None,
+                args=['--disable-blink-features=AutomationControlled']
+            )
             context = browser.new_context(
                 user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                            'Chrome/122.0.0.0 Safari/537.36'
